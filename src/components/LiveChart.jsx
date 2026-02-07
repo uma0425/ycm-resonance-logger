@@ -143,10 +143,9 @@ export default function LiveChart() {
   const firebaseData = useFirebaseResonanceData()
   const persisted = usePersistedResonanceData()
   const mockData = useMockResonanceData()
-  const hasFirebase = isConfigured() && firebaseData.length > 0
+  const firebaseConfigured = isConfigured()
   const hasPersisted = persisted.length > 0
-  const data = hasFirebase ? firebaseData : hasPersisted ? persisted : mockData
-  const isLive = hasFirebase
+  const data = firebaseConfigured ? firebaseData : hasPersisted ? persisted : mockData
   const [showPeak, setShowPeak] = useState(false)
   const [chartWidth, setChartWidth] = useState(400)
   const containerRef = useRef(null)
@@ -195,13 +194,9 @@ export default function LiveChart() {
         <div className="font-mono text-sm flex gap-4">
           <span className="text-neon-green/90">
             現在の熱量: <strong>{lastValue}</strong>
-            {!isLive && <span className="text-amber-400/80 text-[10px] ml-1">(デモ)</span>}
-            {isLive && <span className="text-neon-green/80 text-[10px] ml-1">(全員)</span>}
           </span>
           <span className="text-slate-400">
             累計: <strong>{totalCount}</strong>
-            {!isLive && <span className="text-amber-400/80 text-[10px] ml-1">(デモ)</span>}
-            {isLive && <span className="text-neon-green/80 text-[10px] ml-1">(全員)</span>}
           </span>
         </div>
       </div>

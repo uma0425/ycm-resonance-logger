@@ -25,7 +25,10 @@ function isConfigured() {
 function getDb() {
   if (!isConfigured()) return null
   if (!db) {
-    app = initializeApp(config)
+    const safeConfig = Object.fromEntries(
+      Object.entries(config).filter(([, v]) => v != null && v !== '')
+    )
+    app = initializeApp(safeConfig)
     db = getDatabase(app)
   }
   return db

@@ -60,10 +60,22 @@ VITE_FIREBASE_APP_ID=あなたのappId
 
 ---
 
-## 4. Vercel にデプロイする場合
+## 4. Vercel にデプロイする場合（必須）
 
-Vercel の **「Settings」→「Environment Variables」** で、上記の `VITE_FIREBASE_*` をすべて追加します。  
-追加後、**「Redeploy」** で再デプロイすると、本番でも全参加者のタップが累計に反映されます。
+本番で全参加者のカウントを反映するには、**Vercel に環境変数を設定する必要があります**。
+
+1. Vercel のプロジェクトを開く → **「Settings」** → **「Environment Variables」**
+2. 次の 7 つを **すべて** 追加する（名前は一字違いも不可）:
+   - `VITE_FIREBASE_API_KEY`
+   - `VITE_FIREBASE_AUTH_DOMAIN`
+   - `VITE_FIREBASE_DATABASE_URL`（Realtime Database の URL）
+   - `VITE_FIREBASE_PROJECT_ID`
+   - `VITE_FIREBASE_STORAGE_BUCKET`
+   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+   - `VITE_FIREBASE_APP_ID`
+3. **「Deployments」** に戻り、最新のデプロイの **「⋯」→「Redeploy」** を実行する。  
+   ※ Vite はビルド時に環境変数を埋め込むため、**変数を追加・変更したあとは必ず Redeploy が必要**です。
+4. ダッシュボードで **「現在の熱量」「累計」の横に「(全員)」** と表示されていれば、Firebase 接続済みです。「(デモ)」のままなら環境変数が未設定かビルド前の設定です。
 
 ---
 
