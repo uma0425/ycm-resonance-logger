@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import ResonanceButton from '../components/ResonanceButton'
 import MyLog from '../components/MyLog'
+import { pushTap } from '../lib/firebase'
 
 const STORAGE_KEY = 'resonance-my-log'
 const SESSION_START_KEY = 'resonance-session-start'
@@ -64,10 +65,12 @@ export default function ParticipantView() {
   }, [log])
 
   const onResonance = useCallback(() => {
+    const now = Date.now()
     setLog((prev) => {
-      const next = [...prev, Date.now()]
+      const next = [...prev, now]
       return next.length > MAX_LOG_LENGTH ? next.slice(-MAX_LOG_LENGTH) : next
     })
+    pushTap()
   }, [])
 
   return (

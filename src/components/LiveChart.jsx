@@ -9,6 +9,7 @@ import {
   Tooltip,
   ReferenceLine,
 } from 'recharts'
+import { subscribeToTaps, isConfigured } from '../lib/firebase'
 
 const CHART_HEIGHT = 280
 
@@ -68,6 +69,23 @@ function buildSeriesFromTimestamps(timestamps) {
   return sliced
 }
 
+function useFirebaseResonanceData() {
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    if (!isConfigured()) return () => {}
+    const unsubscribe = subscribeToTaps((snapshot) => {
+      const timestamps = Object.values(snapshot)
+        .map((v) => (v && typeof v.t === 'number' ? v.t : null))
+        .filter((t) => t != null)
+      setData(buildSeriesFromTimestamps(timestamps))
+    })
+    return unsubscribe
+  }, [])
+
+  return data
+}
+
 function useMockResonanceData() {
   const startRef = useRef(Date.now())
   const [data, setData] = useState(() => {
@@ -122,10 +140,13 @@ function useMockResonanceData() {
 }
 
 export default function LiveChart() {
+  const firebaseData = useFirebaseResonanceData()
   const persisted = usePersistedResonanceData()
   const mockData = useMockResonanceData()
+  const hasFirebase = isConfigured() && firebaseData.length > 0
   const hasPersisted = persisted.length > 0
-  const data = hasPersisted ? persisted : mockData
+  const data = hasFirebase ? firebaseData : hasPersisted ? persisted : mockData
+  const isLive = hasFirebase
   const [showPeak, setShowPeak] = useState(false)
   const [chartWidth, setChartWidth] = useState(400)
   const containerRef = useRef(null)
@@ -174,11 +195,13 @@ export default function LiveChart() {
         <div className="font-mono text-sm flex gap-4">
           <span className="text-neon-green/90">
             現在の熱量: <strong>{lastValue}</strong>
-            {!hasPersisted && <span className="text-amber-400/80 text-[10px] ml-1">(デモ)</span>}
+            {!isLive && <span className="text-amber-400/80 text-[10px] ml-1">(デモ)</span>}
+            {isLive && <span className="text-neon-green/80 text-[10px] ml-1">(全員)</span>}
           </span>
           <span className="text-slate-400">
             累計: <strong>{totalCount}</strong>
-            {!hasPersisted && <span className="text-amber-400/80 text-[10px] ml-1">(デモ)</span>}
+            {!isLive && <span className="text-amber-400/80 text-[10px] ml-1">(デモ)</span>}
+            {isLive && <span className="text-neon-green/80 text-[10px] ml-1">(全員)</span>}
           </span>
         </div>
       </div>
